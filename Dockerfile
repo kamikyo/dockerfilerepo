@@ -8,5 +8,5 @@ RUN aspnetcore_version=3.1.7 \
     && echo "$aspnetcore_sha512  aspnetcore.tar.gz" | sha512sum -c - \
     && tar -ozxf aspnetcore.tar.gz -C /usr/share/dotnet ./shared/Microsoft.AspNetCore.App \
     && rm aspnetcore.tar.gz \
-    && apk add --no-cache icu-libs \
-    && DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+    && apk add --no-cache icu-libs
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
