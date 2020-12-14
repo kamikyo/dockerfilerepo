@@ -10,8 +10,9 @@ RUN aspnetcore_version=3.1.7 \
     && rm aspnetcore.tar.gz \
     && apk add --no-cache icu-libs
     
-RUN apk add unixODBC
-RUN apk add unixODBC-devel
+RUN apk update \
+    && apk add unixodbc \
+    && apk add unixodbc-dev
     
 RUN wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.6.1.1-1_amd64.apk \
     && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.6.1.1-1_amd64.apk \
