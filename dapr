@@ -1,4 +1,5 @@
 FROM mwendler/wget
 WORKDIR /dapr
 RUN wget --no-check-certificate https://raw.githubusercontent.com/dapr/cli/master/install/install.sh
+RUN wget --no-check-certificate https://github.com/dapr/cli/releases/download/v1.0.0/dapr_linux_amd64.tar.gz
 ENTRYPOINT ["sleep", "10m"]
