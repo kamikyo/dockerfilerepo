@@ -1,0 +1,18 @@
+ARG REPO=mcr.microsoft.com/dotnet/aspnet
+FROM $REPO:5.0.1-alpine3.12
+
+RUN apk update \
+    && apk add unixodbc \
+    && apk add unixodbc-dev \
+    && apk add openssh-client
+    
+RUN wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.6.1.1-1_amd64.apk \
+    && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.6.1.1-1_amd64.apk \
+    && apk add gnupg \
+    && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.6.1.1-1_amd64.sig \
+    && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.6.1.1-1_amd64.sig \
+    && apk add --allow-untrusted msodbcsql17_17.6.1.1-1_amd64.apk \
+    && apk add --allow-untrusted mssql-tools_17.6.1.1-1_amd64.apk
+    
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+RUN apk add --no-cache icu-libs
