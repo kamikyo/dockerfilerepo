@@ -26,3 +26,7 @@ RUN wget -O dotnet.tar.gz https://dotnetcli.azureedge.net/dotnet/Sdk/$DOTNET_SDK
     && rm dotnet.tar.gz \
     # Trigger first run experience by running arbitrary cmd
     && dotnet help
+
+RUN dotnet tool install -g dotnet-sos
+RUN apk add lldb
+RUN dotnet tool install -g dotnet-dump
