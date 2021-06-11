@@ -54,6 +54,6 @@ RUN dotnet tool install -g dotnet-trace
 RUN dotnet tool install -g dotnet-counters
 RUN dotnet tool install -g dotnet-dump
 
-RUN curl -OL https://aka.ms/perfcollect \
+RUN wget -O perfcollect https://aka.ms/perfcollect \
     && chmod +x perfcollect \
     && ./perfcollect install
