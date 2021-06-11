@@ -10,7 +10,10 @@ ENV \
     # Enable correct mode for dotnet watch (only mode supported in a container)
     DOTNET_USE_POLLING_FILE_WATCHER=true \
     # Skip extraction of XML docs - generally not useful within an image/container - helps performance
-    NUGET_XMLDOC_MODE=skip
+    NUGET_XMLDOC_MODE=skip \
+    # perf tool required. .NET 6 standardizes on the prefix DOTNET_ instead of COMPlus_ for environment variables that configure .NET run-time behavior. 
+    COMPlus_PerfMapEnabled=1 \
+    COMPlus_EnableEventLog=1
 
 RUN apk add --no-cache \
         curl \
@@ -48,3 +51,7 @@ RUN apk add lldb
 RUN dotnet tool install -g dotnet-trace
 RUN dotnet tool install -g dotnet-counters
 RUN dotnet tool install -g dotnet-dump
+
+RUN curl -OL https://aka.ms/perfcollect \
+    && chmod +x perfcollect \
+    && ./perfcollect install
