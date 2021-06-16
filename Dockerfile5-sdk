@@ -54,6 +54,17 @@ RUN dotnet tool install -g dotnet-trace
 RUN dotnet tool install -g dotnet-counters
 RUN dotnet tool install -g dotnet-dump
 
-RUN wget -O /usr/share/perfcollect https://aka.ms/perfcollect
-RUN chmod 755 /usr/share/perfcollect
-RUN /usr/share/perfcollect install
+RUN apk update \
+    && apk add unixodbc \
+    && apk add unixodbc-dev
+    
+RUN wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.6.1.1-1_amd64.apk \
+    && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.6.1.1-1_amd64.apk \
+    && apk add gnupg \
+    && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.6.1.1-1_amd64.sig \
+    && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.6.1.1-1_amd64.sig \
+    && apk add --allow-untrusted msodbcsql17_17.6.1.1-1_amd64.apk \
+    && apk add --allow-untrusted mssql-tools_17.6.1.1-1_amd64.apk
+    
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+RUN apk add --no-cache icu-libs
