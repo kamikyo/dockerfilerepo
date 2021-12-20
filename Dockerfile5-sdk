@@ -15,7 +15,8 @@ ENV \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-DotnetSDK-Alpine-3.13 \
     # perf tool required. .NET 6 standardizes on the prefix DOTNET_ instead of COMPlus_ for environment variables that configure .NET run-time behavior. 
     COMPlus_PerfMapEnabled=1 \
-    COMPlus_EnableEventLog=1
+    COMPlus_EnableEventLog=1 \
+    DOTNET_PerfMapEnabled=1
 
 RUN apk add --no-cache \
         curl \
@@ -71,4 +72,3 @@ RUN apk add --no-cache icu-libs
 
 RUN apk add --no-cache \
         perf
-ENV DOTNET_PerfMapEnabled=1
