@@ -68,3 +68,7 @@ RUN wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8
     
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 RUN apk add --no-cache icu-libs
+
+RUN apk add --no-cache \
+        perf
+ENV DOTNET_PerfMapEnabled=1
