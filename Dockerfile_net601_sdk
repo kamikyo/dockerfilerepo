@@ -24,7 +24,10 @@ ENV \
     COMPlus_PerfMapEnabled=1 \
     COMPlus_EnableEventLog=1 \
     DOTNET_PerfMapEnabled=1 \
-    DOTNET_EnableEventLog=1
+    DOTNET_EnableEventLog=1 \
+    COMPlus_DbgEnableMiniDump=1 \
+    COMPlus_DbgMiniDumpType=4 \
+    COMPlus_DbgMiniDumpName=/app/site/coredump.dmp
 
 RUN apk add --no-cache \
         curl \
@@ -62,6 +65,7 @@ RUN apk add lldb
 RUN dotnet tool install -g dotnet-trace
 RUN dotnet tool install -g dotnet-counters
 RUN dotnet tool install -g dotnet-dump
+RUN dotnet tool install -g dotnet-symbol
 
 RUN apk update \
     && apk add unixodbc \
