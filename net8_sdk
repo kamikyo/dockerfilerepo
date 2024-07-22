@@ -74,3 +74,4 @@ RUN wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8
     && apk add --allow-untrusted mssql-tools_17.6.1.1-1_amd64.apk
     
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+ENV DOTNET_EnableWriteXorExecute=0
