@@ -1,1 +1,19 @@
-FROM airbyte/destination-duckdb
+FROM sptrakesh/cppbase
+
+ENV VERSION=1.0.0
+
+WORKDIR /opt
+RUN apk --update --no-cache add ninja \
+  && git clone -b v${VERSION} https://github.com/duckdb/duckdb.git \
+  && cd duckdb \
+  && GEN="ninja make" CXX_STANDARD=20 EXTRA_CMAKE_VARIABLES="-DCMAKE_INSTALL_PREFIX=/opt/local" BUILD_JEMALLOC=1 make -j 8 \
+  && cmake --install build/release
+
+
+FROM sptrakesh/cppbase
+MAINTAINER Rakesh Vidyadharan <rakesh@sptci.com>
+
+ENV VERSION=1.0.0
+
+WORKDIR /opt
+COPY --from=0 /opt/local local
