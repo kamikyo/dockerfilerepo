@@ -1,0 +1,42 @@
+ARG REPO=mcr.microsoft.com/dotnet/runtime
+
+# Installer image
+FROM $REPO:10.0.0-alpine3.22-amd64 AS installer
+
+# Retrieve ASP.NET Core
+RUN aspnetcore_version=10.0.0 \
+    && wget \
+        https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/$aspnetcore_version/aspnetcore-runtime-$aspnetcore_version-linux-musl-x64.tar.gz \
+        https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/$aspnetcore_version/aspnetcore-runtime-$aspnetcore_version-linux-musl-x64.tar.gz.sha512 \
+    && sha512sum -c aspnetcore-runtime-$aspnetcore_version-linux-musl-x64.tar.gz.sha512 \
+    && mkdir --parents /dotnet \
+    && tar --gzip --extract --no-same-owner --file aspnetcore-runtime-$aspnetcore_version-linux-musl-x64.tar.gz --directory /dotnet ./shared/Microsoft.AspNetCore.App \
+    && rm \
+        aspnetcore-runtime-$aspnetcore_version-linux-musl-x64.tar.gz \
+        aspnetcore-runtime-$aspnetcore_version-linux-musl-x64.tar.gz.sha512
+
+RUN apk update \
+    && apk add openssl1.1-compat \
+    && apk add unixodbc \
+    && apk add unixodbc-dev
+    
+RUN wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.6.1.1-1_amd64.apk \
+    && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.6.1.1-1_amd64.apk \
+    && apk add gnupg \
+    && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.6.1.1-1_amd64.sig \
+    && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.6.1.1-1_amd64.sig \
+    && apk add --allow-untrusted msodbcsql17_17.6.1.1-1_amd64.apk \
+    && apk add --allow-untrusted mssql-tools_17.6.1.1-1_amd64.apk
+    
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+ENV DOTNET_EnableWriteXorExecute=0
+RUN apk add --no-cache icu-libs
+
+
+# ASP.NET Core image
+FROM $REPO:10.0.0-alpine3.22-amd64
+
+# ASP.NET Core version
+ENV ASPNET_VERSION=10.0.0
+
+COPY --from=installer ["/dotnet", "/usr/share/dotnet"]
