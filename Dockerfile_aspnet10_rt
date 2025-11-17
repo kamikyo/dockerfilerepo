@@ -16,9 +16,10 @@ RUN aspnetcore_version=10.0.0 \
         aspnetcore-runtime-$aspnetcore_version-linux-musl-x64.tar.gz.sha512
 
 RUN apk update \
-    && apk add openssl1.1-compat \
-    && apk add unixodbc \
-    && apk add unixodbc-dev
+    && apk add --no-cache \
+        ca-certificates \
+        unixodbc \
+        unixodbc-dev
     
 RUN wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.6.1.1-1_amd64.apk \
     && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.6.1.1-1_amd64.apk \
