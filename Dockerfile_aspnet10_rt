@@ -41,3 +41,10 @@ FROM $REPO:10.0.0-alpine3.22-amd64
 ENV ASPNET_VERSION=10.0.0
 
 COPY --from=installer ["/dotnet", "/usr/share/dotnet"]
+
+# Install glibc compatibility libraries for native libraries (e.g., iclit09b.so)
+RUN apk update \
+    && apk add --no-cache \
+        libcrypt-compat \
+        libc6-compat \
+        gcompat
