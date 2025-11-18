@@ -1,3 +1,15 @@
-FROM scratch
-ADD alpine-minirootfs-3.22.2-x86_64.tar.gz /
-CMD ["/bin/sh"]
+ARG REPO=mcr.microsoft.com/dotnet/runtime
+
+# 基于 .NET Runtime 的 Alpine 3.22 镜像（它本身就是基于 Alpine 3.22 的）
+FROM $REPO:10.0.0-alpine3.22-amd64
+
+# 更新包索引并测试安装所需的包
+RUN apk update \
+    && apk add --no-cache \
+        libc6-compat \
+        gcompat \
+        icu-libs
+
+# 如果需要测试 libcrypt-compat，可以尝试安装（如果存在）
+# RUN apk add --no-cache libcrypt-compat || echo "libcrypt-compat not available"
+
