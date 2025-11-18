@@ -15,11 +15,22 @@ RUN aspnetcore_version=10.0.0 \
         aspnetcore-runtime-$aspnetcore_version-linux-musl-x64.tar.gz \
         aspnetcore-runtime-$aspnetcore_version-linux-musl-x64.tar.gz.sha512
 
+# ASP.NET Core image
+FROM $REPO:10.0.0-alpine3.22-amd64
+
+# ASP.NET Core version
+ENV ASPNET_VERSION=10.0.0
+
+COPY --from=installer ["/dotnet", "/usr/share/dotnet"]
+
 RUN apk update \
     && apk add --no-cache \
+        icu-libs \
         ca-certificates \
         unixodbc \
-        unixodbc-dev
+        unixodbc-dev \
+        libc6-compat \
+        gcompat
     
 RUN wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.6.1.1-1_amd64.apk \
     && wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.6.1.1-1_amd64.apk \
@@ -31,19 +42,3 @@ RUN wget https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8
     
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENV DOTNET_EnableWriteXorExecute=0
-RUN apk add --no-cache icu-libs
-
-
-# ASP.NET Core image
-FROM $REPO:10.0.0-alpine3.22-amd64
-
-# ASP.NET Core version
-ENV ASPNET_VERSION=10.0.0
-
-COPY --from=installer ["/dotnet", "/usr/share/dotnet"]
-
-# Install glibc compatibility libraries for native libraries (e.g., iclit09b.so)
-RUN apk update \
-    && apk add --no-cache \
-        libc6-compat \
-        gcompat
