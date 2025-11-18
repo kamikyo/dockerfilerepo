@@ -10,6 +10,53 @@ RUN apk update \
         gcompat \
         icu-libs
 
-# 如果需要测试 libcrypt-compat，可以尝试安装（如果存在）
-# RUN apk add --no-cache libcrypt-compat || echo "libcrypt-compat not available"
+# 验证 libcrypt.so.1 是否存在（仅使用 libc6-compat 和 gcompat）
+RUN echo "=== 第一步：检查 libc6-compat 和 gcompat 是否提供 libcrypt.so.1 ===" \
+    && echo "搜索所有 libcrypt.so 文件：" \
+    && find /usr /lib -name "libcrypt.so*" 2>/dev/null | head -20 || echo "未找到任何 libcrypt.so 文件" \
+    && echo "" \
+    && echo "检查常见位置：" \
+    && (test -f /usr/lib/libcrypt.so.1 && echo "✓ /usr/lib/libcrypt.so.1 存在" || echo "✗ /usr/lib/libcrypt.so.1 不存在") \
+    && (test -f /lib/libcrypt.so.1 && echo "✓ /lib/libcrypt.so.1 存在" || echo "✗ /lib/libcrypt.so.1 不存在") \
+    && (test -f /usr/glibc-compat/lib/libcrypt.so.1 && echo "✓ /usr/glibc-compat/lib/libcrypt.so.1 存在" || echo "✗ /usr/glibc-compat/lib/libcrypt.so.1 不存在") \
+    && echo "=== 第一步检查完成 ==="
+
+# 如果上面的检查没有找到 libcrypt.so.1，则安装完整的 glibc
+RUN if [ ! -f /usr/lib/libcrypt.so.1 ] && [ ! -f /lib/libcrypt.so.1 ] && [ ! -f /usr/glibc-compat/lib/libcrypt.so.1 ]; then \
+        echo "=== 第二步：libcrypt.so.1 不存在，安装完整 glibc ===" \
+        && apk add --no-cache wget \
+        && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
+        && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r1/glibc-2.35-r1.apk \
+        && apk add --no-cache --allow-untrusted glibc-2.35-r1.apk \
+        && rm glibc-2.35-r1.apk \
+        && echo "" \
+        && echo "=== 第三步：glibc 安装完成，验证 libcrypt.so.1 ===" \
+        && echo "搜索所有 libcrypt.so 文件：" \
+        && find /usr /lib -name "libcrypt.so*" 2>/dev/null | head -20 || echo "仍未找到任何 libcrypt.so 文件" \
+        && echo "" \
+        && echo "检查 glibc 安装位置：" \
+        && (test -f /usr/glibc-compat/lib/libcrypt.so.1 && echo "✓ /usr/glibc-compat/lib/libcrypt.so.1 存在" || echo "✗ /usr/glibc-compat/lib/libcrypt.so.1 不存在") \
+        && echo "" \
+        && echo "如果 libcrypt.so.1 在 /usr/glibc-compat/lib/，需要确保运行时能找到它"; \
+    else \
+        echo "=== libcrypt.so.1 已存在，无需安装 glibc ==="; \
+    fi
+
+# 最终验证：确保 libcrypt.so.1 可以被找到
+RUN echo "=== 最终验证：检查 libcrypt.so.1 的可用性 ===" \
+    && if [ -f /usr/glibc-compat/lib/libcrypt.so.1 ]; then \
+        echo "✓ 找到 /usr/glibc-compat/lib/libcrypt.so.1" \
+        && echo "  文件信息：" \
+        && ls -lh /usr/glibc-compat/lib/libcrypt.so.1 \
+        && echo "  注意：运行时需要设置 LD_LIBRARY_PATH 或创建符号链接"; \
+    elif [ -f /usr/lib/libcrypt.so.1 ]; then \
+        echo "✓ 找到 /usr/lib/libcrypt.so.1" \
+        && ls -lh /usr/lib/libcrypt.so.1; \
+    elif [ -f /lib/libcrypt.so.1 ]; then \
+        echo "✓ 找到 /lib/libcrypt.so.1" \
+        && ls -lh /lib/libcrypt.so.1; \
+    else \
+        echo "✗ 警告：未找到 libcrypt.so.1，可能需要其他解决方案"; \
+    fi \
+    && echo "=== 验证完成 ==="
 
