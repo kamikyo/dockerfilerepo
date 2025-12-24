@@ -62,7 +62,9 @@ RUN powershell_version=7.4.13 \
     && find /usr/share/powershell -print | grep -i '.*[.]nupkg$' | xargs rm
 
 RUN dotnet tool install -g dotnet-sos
-RUN apk add lldb
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends lldb \
+    && rm -rf /var/lib/apt/lists/*
 RUN dotnet tool install -g dotnet-trace
 RUN dotnet tool install -g dotnet-counters
 RUN dotnet tool install -g dotnet-dump
